@@ -20,15 +20,14 @@ class WebDino:
         #---------- 
 
         self.element = self.driver.find_element(By.TAG_NAME, 'body')
+        self.takeAction(1) # For Starting the inital game
+        time.sleep(2)
         # self.observation_space = 
         self.action_space = 3
-        # self.actions = ActionChains(self.driver)
 
     def train(self):
         for _ in range(3):
             self.takeAction(1)
-            time.sleep(2)
-
             terminated = False
             while not terminated:
                 action = np.random.choice(self.action_space)
@@ -39,10 +38,11 @@ class WebDino:
 
     def step(self, action):
         self.takeAction(action)
-        time.sleep(0.5)
+        time.sleep(1)
         state = self.returnState()
-        return state, self.isTerminated(state)
-        # time.sleep(1)
+        termination = self.isTerminated(state)
+        return state, termination
+
     
     def takeAction(self, action):
         # print(action)
@@ -59,7 +59,9 @@ class WebDino:
         over_1 = 2052
         isOver_2 = np.sum([state[334, 564], state[337, 573], state[336, 591], state[338, 608]])
         over_2 = 2100
-        if isOver_1 == over_1 or isOver_2 == over_2:
+        if isOver_1 == over_1:
+            time.sleep(1)
+        if isOver_2 == over_2:
             return True
         else: return False
 
