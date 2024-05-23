@@ -2,22 +2,30 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import WebDriverException
 import time
 
 class WebAgent:
     def __init__(self):
         
         self.driver = webdriver.Chrome()
-        self.driver.get("https://chromedino.com/")
-        self.element = self.driver.find_element(By.CLASS_NAME, 'runner-canvas')
-        self.actions = ActionChains(self.driver)
+        try: self.driver.get("chrome://dino/")
+        except WebDriverException: pass
+        
+        #---------- Needs exp
+        # self.driver.fullscreen_window()
+        # time.sleep(1)
+        #----------
+
+        self.element = self.driver.find_element(By.TAG_NAME, 'body')
+        # self.actions = ActionChains(self.driver)
 
     def currState(self):
-        self.element.screenshot('dino.jpg')
+        self.element.screenshot('dino.png')
 
     def train(self):
         self.takeActions()
-        time.sleep(2)
+        time.sleep(5)
         self.takeActions()
         time.sleep(5)
         self.currState()
@@ -25,7 +33,7 @@ class WebAgent:
     
     def takeActions(self):
 
-        self.actions.send_keys(Keys.SPACE).perform()
+        self.element.send_keys(Keys.SPACE)
 
 if __name__ == "__main__":
 
