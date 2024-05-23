@@ -25,13 +25,7 @@ class WebDino:
         # self.actions = ActionChains(self.driver)
 
     def train(self):
-        # self.takeAction()
-        # time.sleep(1)
-        # print(self.step(self.action_space.sample()))
-        # self.takeAction()
-        # time.sleep(1)
-        # print(self.step())
-        for ep in range(3):
+        for _ in range(3):
             self.takeAction(1)
             time.sleep(2)
 
@@ -45,7 +39,7 @@ class WebDino:
 
     def step(self, action):
         self.takeAction(action)
-        time.sleep(1)
+        time.sleep(0.5)
         state = self.returnState()
         return state, self.isTerminated(state)
         # time.sleep(1)
@@ -53,7 +47,7 @@ class WebDino:
     def takeAction(self, action):
         # print(action)
         if action == 1: self.element.send_keys(Keys.SPACE)
-        elif action == 2: self.element.send_keys(Keys.ARROW_UP)
+        elif action == 2: self.element.send_keys(Keys.ARROW_DOWN)
 
     def returnState(self):
         self.element.screenshot('dino.png') 
@@ -61,12 +55,10 @@ class WebDino:
         return state
     
     def isTerminated(self, state):
-        # print(state)
-        isOver_1 = np.sum([state[578, 347], state[583, 342], state[589, 336], state[596, 329]])
+        isOver_1 = np.sum([state[347, 578], state[342, 583], state[336, 589], state[329, 596]])
         over_1 = 2052
-        isOver_2 = np.sum([state[564, 334], state[573, 337], state[591, 336], state[608, 338]])
+        isOver_2 = np.sum([state[334, 564], state[337, 573], state[336, 591], state[338, 608]])
         over_2 = 2100
-        print(isOver_1, isOver_2)
         if isOver_1 == over_1 or isOver_2 == over_2:
             return True
         else: return False

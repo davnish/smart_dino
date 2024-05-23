@@ -10,7 +10,7 @@ import time
 #     time.sleep(1)
 # ss.close()
 
-img = Image.open('dino.png')
+img = Image.open('over_2.png', )
 img = np.array(img)
 print(img.shape)
 print(img.shape[0]//2, img.shape[1]//2)
@@ -19,13 +19,11 @@ print(img.shape[0]//2, img.shape[1]//2)
 import matplotlib.pyplot as plt
 def isTerminated(state):
     # print(state)
-    isOver_1 = np.sum([state[578, 347], state[583, 342], state[589, 336], state[596, 329]])
-    print(state[578, 347], state[583, 342], state[589, 336], state[596, 329])
-    over_1 = 1424
-    isOver_2 = np.sum([state[564, 334], state[573, 337], state[591, 336], state[608, 338]])
-    print([state[564, 334], state[573, 337], state[591, 336], state[608, 338]])
-    over_2 = 1424
-    print(isOver_1, isOver_2)
+    isOver_1 = np.sum([state[347, 578], state[342, 583], state[336, 589], state[329, 596]])
+    over_1 = 2052
+    isOver_2 = np.sum([state[334, 564], state[337, 573], state[336, 591], state[338, 608]])
+    over_2 = 2100
+    print(isOver_2)
     if isOver_1 == over_1 or isOver_2 == over_2:
         return True
     else: return False
