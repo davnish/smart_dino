@@ -15,23 +15,32 @@ torch.manual_seed(42)
 class createNetwork(nn.Module):
     def __init__(self):
         super(createNetwork,self).__init__()
-        self.conv1 = nn.Conv2d(3, 10, kernel_size=(10,10))   
-        self.maxpool1 = nn.MaxPool2d(10) 
+        self.conv1 = nn.Conv2d(3,8, kernel_size=(3,3))   
+        self.maxpool1 = nn.MaxPool2d(3) 
         
-        self.conv2 = nn.Conv2d(10, 20, kernel_size=(10,10))    
-        self.maxpool2 = nn.MaxPool2d(10)
+        self.conv2 = nn.Conv2d(8,4, kernel_size=(3,3))    
+        self.maxpool2 = nn.MaxPool2d(3)
+                
+        self.conv3 = nn.Conv2d(4, 1, kernel_size=(3,3))    
+        self.maxpool3 = nn.MaxPool2d(3)
 
-        self.output = nn.Linear(200, 3)
+        self.flat = nn.Flatten()
+        self.l1 = nn.Linear(9744, 1024)
+        # self.l1 = nn.Linear(97440, 2048)
+        self.output = nn.Linear(1024, 2)
     
     def forward(self, x):
-        # print(x.size())
+
         x = F.relu(self.conv1(x))
         x = self.maxpool1(x)
-
+        # print(x.size())
         x = F.relu(self.conv2(x))
         x = self.maxpool2(x)
-        
-        x = flatten(x)
+        # print(x.size())
+        # x = F.relu(self.conv3(x))
+        # x = self.maxpool3(x)
+        x = self.flat(x)
+        x = F.relu(self.l1(x))
         x = self.output(x)
         return x
 
@@ -57,7 +66,7 @@ class DeepQLearning:
         self.epsilon_decay = epsilon_decay
         self.lr = lr
         self.TAU = TAU 
-        self.actionDimension = env.action_space.n # total no of action
+        self.actionDimension = env.action_space # total no of action
         self.numberEpisodes=numberEpisodes
         self.replayBufferSize = replayBufferSize
         self.batchReplayBufferSize = batchReplayBufferSize
@@ -79,17 +88,15 @@ class DeepQLearning:
 
             rewardsEpisode = 0
             currState = torch.tensor(self.env.reset()) # Converting to tensor
-            isTerminate = False
-            timeStamp = 0
-            while not isTerminate and timeStamp <= 1000: # A timeStamp restriciton is for any episode taking more than 1000 states
-                currAction = self.selectAction(currState, indexEpisode)
-                nxtState, reward, terminated, _, _ = self.env.step(currAction)
+            terminated = False
+            while not terminated: # A timeStamp restriciton is for any episode taking more than 1000 states
+                currAction = self.selectAction(currState.unsqueeze(0), indexEpisode)
+                nxtState, reward, terminated = self.env.step(currAction)
                 nxtState = torch.tensor(nxtState)
                 self.replayBuffer.append((currState, currAction, reward, nxtState, terminated)) # Converting the nxtState to tensor
                 self.trainNetwork()
                 currState = nxtState
                 rewardsEpisode += reward
-                timeStamp += 1
 
                 # Soft updating the target and online network
                 online_net_state_dict = self.onlineNetwork.state_dict()
@@ -105,7 +112,7 @@ class DeepQLearning:
   
     def selectAction(self, currState, indexEpisode):
         if torch.rand(1).item() < self.epsilon:
-            return self.env.action_space.sample()
+            return np.random.choice(self.env.action_space)
         else:
             with torch.no_grad():
                 q_value = self.onlineNetwork(currState.to(self.device))
@@ -134,15 +141,15 @@ class DeepQLearning:
             loss.backward()
             self.optimizer.step()
 
-    def simulateStrategy(self):
+    def simulateStrategy(self, env):
         self.onlineNetwork.eval()
-        env = WebDino()
+        env = env
         state = env.reset()
         self.onlineNetwork.eval()
         for _ in range(1000):
             with torch.no_grad():
                 action = torch.argmax(self.onlineNetwork(torch.tensor(state, dtype=torch.float32).to(self.device).unsqueeze(0))).item() # Selecting here the best optimal strategy
-            state, _, terminated, _, _ = self.env.step(action)
+            state, _, terminated = self.env.step(action)
             time.sleep(0.05)
             if terminated:
                 time.sleep(1)
@@ -155,12 +162,13 @@ class DeepQLearning:
         print(f"Ep Solved : {score}, High_Score : {hg_score}")
 
         solved = np.ones(self.numberEpisodes) * 200
-        avg_rwds = np.mean(rwds.reshape(-1, avg_intv), axis = -1, keepdims=True).repeat(avg_intv, axis = 1).reshape(-1)
-        rwds_df = pd.DataFrame({'Rewards': rwds, 'Average_Rewards': avg_rwds, 'Solved': solved})
+        # avg_rwds = np.mean(rwds.reshape(-1, avg_intv), axis = -1, keepdims=True).repeat(avg_intv, axis = 1).reshape(-1)
+        # rwds_df = pd.DataFrame({'Rewards': rwds, 'Average_Rewards': avg_rwds, 'Solved': solved})
+        rwds_df = pd.DataFrame({'Rewards': rwds, 'Solved': solved})
 
         # plt.figure(figsize=(10, 10))
         plt.plot(rwds_df['Rewards'], color='blue', linewidth=2, label = 'Rewards')
-        plt.plot(rwds_df['Average_Rewards'], color='orange', linestyle='dashed',linewidth=2, label = f'Avg_Rewards')
+        # plt.plot(rwds_df['Average_Rewards'], color='orange', linestyle='dashed',linewidth=2, label = f'Avg_Rewards')
         plt.plot(rwds_df['Solved'], color='red', linestyle='dashed', linewidth=1, label = 'Solved')
         plt.legend()
         plt.xlabel('Episode')
@@ -170,7 +178,7 @@ class DeepQLearning:
         plt.show()
 
 if __name__ == "__main__":
-    x = torch.rand(3, 200,1184)
+    x = torch.rand(1,3,200,1052)
     model = createNetwork()
     st = time.time()
     x = model(x)

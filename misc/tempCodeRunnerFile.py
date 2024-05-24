@@ -1,0 +1,1 @@
+isOver_1 = np.sum([state[:, 117, 578], state[:, 111, 583], state[:, 104, 589], state[: ,96, 596]])
