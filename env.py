@@ -25,23 +25,33 @@ class WebDino:
         # self.observation_space = 
         self.action_space = 3
 
-    def train(self):
-        for _ in range(3):
-            self.takeAction(1)
+    def Simulate(self, games=3):
+        for _ in range(games):
+            currState = self.reset()
             terminated = False
             while not terminated:
                 action = np.random.choice(self.action_space)
-                currState, terminated = self.step(action)
+                currState, reward, terminated = self.step(action)
                 print(terminated)
 
+            print(f"Score: {self.timeStamp}")
         self.driver.quit()
+    
+    def reset(self):
+        self.timeStamp = 0
+        self.takeAction(1)
+        time.sleep(0.5)
+        state = self.returnState()
+        return state
 
     def step(self, action):
+        self.timeStamp += 1
         self.takeAction(action)
-        time.sleep(1)
+        time.sleep(0.5)
         state = self.returnState()
-        termination = self.isTerminated(state)
-        return state, termination
+        terminated = self.isTerminated(state)
+        reward = self.reward()
+        return state, reward, terminated
 
     
     def takeAction(self, action):
@@ -51,21 +61,29 @@ class WebDino:
 
     def returnState(self):
         self.element.screenshot('dino.png') 
-        state = np.asarray(Image.open('dino.png'))
+        state = self.stateClip(np.asarray(Image.open('dino.png').convert('RGB')))
         return state
     
     def isTerminated(self, state):
-        isOver_1 = np.sum([state[347, 578], state[342, 583], state[336, 589], state[329, 596]])
-        over_1 = 2052
-        isOver_2 = np.sum([state[334, 564], state[337, 573], state[336, 591], state[338, 608]])
-        over_2 = 2100
+        isOver_1 = np.sum([state[117, 578], state[111, 583], state[104, 589], state[96, 596]])
+        over_1 = 1032
+        isOver_2 = np.sum([state[104, 564], state[104, 573], state[104, 591], state[104, 608]])
+        over_2 = 1080
         if isOver_1 == over_1:
             time.sleep(1)
         if isOver_2 == over_2:
             return True
         else: return False
-
+    
+    def stateClip(self, state):
+        return state[232:432, :]
+    
+    def reward(self):
+        return 1
 
 if __name__ == "__main__":
     dino = WebDino()
-    dino.train()
+    dino.Simulate()
+
+    #-----------------
+    # Some issues with terminations are still to be resolved.

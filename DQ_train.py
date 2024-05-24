@@ -12,31 +12,25 @@ import os
 random.seed(42)
 torch.manual_seed(42)
 
-
-def f(env):
-    state = env.state[0]
-    if -1 < state < 1 :
-        return 1
-    else: return -2
-
 class createNetwork(nn.Module):
     def __init__(self):
         super(createNetwork,self).__init__()
-        self.conv1 = nn.Conv2d(4, 20 , 5)   
-        self.maxpool1 = nn.MaxPool2d(2) 
+        self.conv1 = nn.Conv2d(3, 10, kernel_size=(10,10))   
+        self.maxpool1 = nn.MaxPool2d(10) 
         
-        self.conv2 = nn.Conv2d(20, 40 , 5)    
-        self.maxpool2 = nn.MaxPool2d(2)
+        self.conv2 = nn.Conv2d(10, 20, kernel_size=(10,10))    
+        self.maxpool2 = nn.MaxPool2d(10)
 
-        self.output = nn.Linear(128, )
+        self.output = nn.Linear(200, 3)
     
     def forward(self, x):
+        # print(x.size())
         x = F.relu(self.conv1(x))
         x = self.maxpool1(x)
-        
+
         x = F.relu(self.conv2(x))
         x = self.maxpool2(x)
-
+        
         x = flatten(x)
         x = self.output(x)
         return x
@@ -72,8 +66,8 @@ class DeepQLearning:
 
         # self.device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu' # If You want to use gpu uncommnet this
         self.device = 'cpu'
-        self.onlineNetwork = createNetwork(states=self.env.observation_space.shape[0], actionSpace=self.actionDimension).to(self.device)
-        self.targetNetwork = createNetwork(states=self.env.observation_space.shape[0], actionSpace=self.actionDimension).to(self.device)
+        self.onlineNetwork = createNetwork().to(self.device)
+        self.targetNetwork = createNetwork().to(self.device)
         self.targetNetwork.load_state_dict(self.onlineNetwork.state_dict()) # Setting the weights of online network -> target network 
 
         self.loss_fn = nn.MSELoss()
@@ -84,14 +78,14 @@ class DeepQLearning:
         for indexEpisode in range(self.numberEpisodes):
 
             rewardsEpisode = 0
-            currState = torch.tensor(self.env.reset()[0]) # Converting to tensor
+            currState = torch.tensor(self.env.reset()) # Converting to tensor
             isTerminate = False
             timeStamp = 0
             while not isTerminate and timeStamp <= 1000: # A timeStamp restriciton is for any episode taking more than 1000 states
                 currAction = self.selectAction(currState, indexEpisode)
-                nxtState, reward, isTerminate, _, _ = self.env.step(currAction)
+                nxtState, reward, terminated, _, _ = self.env.step(currAction)
                 nxtState = torch.tensor(nxtState)
-                self.replayBuffer.append((currState, currAction, reward, nxtState, isTerminate)) # Converting the nxtState to tensor
+                self.replayBuffer.append((currState, currAction, reward, nxtState, terminated)) # Converting the nxtState to tensor
                 self.trainNetwork()
                 currState = nxtState
                 rewardsEpisode += reward
@@ -141,15 +135,14 @@ class DeepQLearning:
             self.optimizer.step()
 
     def simulateStrategy(self):
-        env = gym.make(self.env.spec.id, render_mode='human')
         self.onlineNetwork.eval()
-        state = env.reset()[0]
-        env.render()
+        env = WebDino()
+        state = env.reset()
         self.onlineNetwork.eval()
         for _ in range(1000):
             with torch.no_grad():
                 action = torch.argmax(self.onlineNetwork(torch.tensor(state, dtype=torch.float32).to(self.device).unsqueeze(0))).item() # Selecting here the best optimal strategy
-            state, _, terminated, _, _ = env.step(action)
+            state, _, terminated, _, _ = self.env.step(action)
             time.sleep(0.05)
             if terminated:
                 time.sleep(1)
@@ -161,7 +154,7 @@ class DeepQLearning:
         hg_score = np.sum(rwds>=300)
         print(f"Ep Solved : {score}, High_Score : {hg_score}")
 
-        solved = np.ones(numberEpisodes) * 200
+        solved = np.ones(self.numberEpisodes) * 200
         avg_rwds = np.mean(rwds.reshape(-1, avg_intv), axis = -1, keepdims=True).repeat(avg_intv, axis = 1).reshape(-1)
         rwds_df = pd.DataFrame({'Rewards': rwds, 'Average_Rewards': avg_rwds, 'Solved': solved})
 
@@ -177,32 +170,10 @@ class DeepQLearning:
         plt.show()
 
 if __name__ == "__main__":
-
-    # Explanation of every hyperparameter is in the docstirng of `DeepQLearning` class
-    # Hyperparameters ###########
-    model_no = 3
-    numberEpisodes = 1000
-    model_name = 'LunarLander-v2'
-    gamma = 0.99
-    epsilon = 1
-    epsilon_decay = 0.992 # changing this from 0.995
-    epsilon_end = 0.1 # Changing this from 0.05
-    lr = 1e-4
-    TAU = 0.001
-    replayBufferSize = 10000
-    batchReplayBufferSize = 256
-    #############################
-
-    env = gym.make(model_name)
-    env.action_space.seed(42)
-
-    dqn = DeepQLearning(env, gamma=gamma, epsilon=epsilon, epsilon_decay=epsilon_decay, 
-                        epsilon_end=epsilon_end, lr = lr, replayBufferSize=replayBufferSize, 
-                        batchReplayBufferSize=batchReplayBufferSize, TAU=TAU, numberEpisodes=numberEpisodes)
-    start = time.time()
-    dqn.trainigEpisodes()
-    end = time.time()
-    print(f'Time: {end - start}')
-    torch.save(dqn.onlineNetwork.state_dict(), os.path.join('models', f'DQ_{model_no}.pt')) # Saving the model
-    dqn.simulateStrategy()
-    dqn.plotRewards(model_no, avg_intv=4)
+    x = torch.rand(3, 200,1184)
+    model = createNetwork()
+    st = time.time()
+    x = model(x)
+    ed = time.time()
+    print(ed-st)
+    print(x.size())
