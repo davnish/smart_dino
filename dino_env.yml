@@ -4,7 +4,6 @@ channels:
 dependencies:
   - pillow
   - pytorch
-  - torchaudio
   - torchvision
   - conda-forge::selenium
   - matplotlib
