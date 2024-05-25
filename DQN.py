@@ -15,30 +15,34 @@ torch.manual_seed(42)
 class createNetwork(nn.Module):
     def __init__(self):
         super(createNetwork,self).__init__()
-        self.conv1 = nn.Conv2d(3,8, kernel_size=(3,3))   
-        self.maxpool1 = nn.MaxPool2d(3) 
+        self.conv1 = nn.Conv2d(3,32, kernel_size=(3,3), stride=(2,2))   
+        self.maxpool1 = nn.MaxPool2d(5, stride=(2,2)) 
         
-        self.conv2 = nn.Conv2d(8,4, kernel_size=(3,3))    
+        self.conv2 = nn.Conv2d(32,64, kernel_size=(3,3))    
         self.maxpool2 = nn.MaxPool2d(3)
                 
-        self.conv3 = nn.Conv2d(4, 1, kernel_size=(3,3))    
-        self.maxpool3 = nn.MaxPool2d(3)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=(3,3), stride=(3,3))    
+        self.maxpool3 = nn.MaxPool2d(3, stride=(3,3))
 
         self.flat = nn.Flatten()
-        self.l1 = nn.Linear(9744, 1024)
+        self.l1 = nn.Linear(1152, 64)
         # self.l1 = nn.Linear(97440, 2048)
-        self.output = nn.Linear(1024, 2)
+        self.output = nn.Linear(64, 2)
     
     def forward(self, x):
 
         x = F.relu(self.conv1(x))
         x = self.maxpool1(x)
         # print(x.size())
+
         x = F.relu(self.conv2(x))
+        # print(x.size())
         x = self.maxpool2(x)
         # print(x.size())
-        # x = F.relu(self.conv3(x))
-        # x = self.maxpool3(x)
+        x = F.relu(self.conv3(x))
+        # print(x.size())
+        x = self.maxpool3(x)
+
         x = self.flat(x)
         x = F.relu(self.l1(x))
         x = self.output(x)
