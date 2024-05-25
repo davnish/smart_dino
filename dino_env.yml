@@ -1,0 +1,12 @@
+name: dino
+channels:
+  - defaults
+dependencies:
+  - pillow
+  - pytorch
+  - torchaudio
+  - torchvision
+  - conda-forge::selenium
+  - matplotlib
+  - pandas
+prefix: /Users/nischalsingh/miniconda3/envs/dino
