@@ -1,39 +1,26 @@
-from PIL import ImageGrab
-from PIL import Image
+import cv2 as cv
 import numpy as np
-import time
 import matplotlib.pyplot as plt
 
-# for _ in range(9):
-#     ss = ImageGrab.grab(bbox=(0, 400, 1300, 700))
-#     ss.save("ss.png")
-#     print(np.array(ss))
-#     time.sleep(1)
-# ss.close()
+img = cv.imread('over/over_16.png', cv.IMREAD_GRAYSCALE).astype('float32')
+threshold, img_thresh = cv.threshold(img, 100, 255, cv.THRESH_BINARY)
 
-img = Image.open('over_1.png').convert('RGB')
-img = np.array(img)
-# print(img.shape)
-# print(img.shape[0]//2, img.shape[1]//2)q
-# print(np.array(img)[:,:2])
-# img.show()
+print(img.shape)
+cx = img.shape[0] // 2
+cy = img.shape[1] // 2
+print(cx, cy)
+
+# Draw a white circle with a radius of 20 pixels
+# cv.circle(img_thresh, (323, 70), radius=1, color=(0), thickness=-1)
+
+# Thresholding
+
+
 def isTerminated(state):
-    # print(state)
-    isOver_1 = np.sum([state[:, 117, 447], state[:, 111, 452], state[:, 104, 458], state[: ,96, 465]])
-    over_1 = 1032
-    print(isOver_1)
-    isOver_2 = np.sum([state[:, 104, 432], state[:, 104, 442], state[:, 104, 460], state[: ,104, 477]])
-    over_2 = 1080
-    print(isOver_2)
-    if isOver_1 == over_1 or isOver_2 == over_2:
+    if state[70, 323] + state[73, 345] + state[70, 368] + state[74, 400] == 1020:
         return True
     else: return False
 
-img = np.transpose(img[232:432, 132:], (2,0,1))
-print(img.shape)
-print(isTerminated(img))
-
-plt.imshow(img.transpose((1,2,0)))
+print(isTerminated(img_thresh))
+plt.imshow(img_thresh, cmap='gray')
 plt.show()
-
-

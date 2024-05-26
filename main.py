@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     # Explanation of every hyperparameter is in the docstirng of `DeepQLearning` class
     # Hyperparameters ###########
-    model_no = 1
+    model_no = 2
     numberEpisodes = 100
     gamma = 0.99
     epsilon = 1
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     epsilon_end = 0.1 # Changing this from 0.05
     lr = 1e-4
     TAU = 0.001
-    replayBufferSize = 1000
+    replayBufferSize = 10000
     batchReplayBufferSize = 8
     #############################
 

@@ -15,32 +15,28 @@ torch.manual_seed(42)
 class createNetwork(nn.Module):
     def __init__(self):
         super(createNetwork,self).__init__()
-        self.conv1 = nn.Conv2d(3,32, kernel_size=(3,3), stride=(2,2))   
-        self.maxpool1 = nn.MaxPool2d(5, stride=(2,2)) 
+        self.conv1 = nn.Conv2d(1,8, kernel_size=(3,3))   
+        self.maxpool1 = nn.MaxPool2d(3) 
         
-        self.conv2 = nn.Conv2d(32,64, kernel_size=(3,3))    
+        self.conv2 = nn.Conv2d(8,16, kernel_size=(3,3))    
         self.maxpool2 = nn.MaxPool2d(3)
                 
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=(3,3), stride=(3,3))    
-        self.maxpool3 = nn.MaxPool2d(3, stride=(3,3))
+        self.conv3 = nn.Conv2d(16, 32, kernel_size=(3,3)) 
+        self.maxpool3 = nn.MaxPool2d(3)
 
         self.flat = nn.Flatten()
-        self.l1 = nn.Linear(1152, 64)
-        # self.l1 = nn.Linear(97440, 2048)
-        self.output = nn.Linear(64, 2)
+        self.l1 = nn.Linear(1248, 512)
+        self.output = nn.Linear(512, 2)
     
     def forward(self, x):
 
         x = F.relu(self.conv1(x))
         x = self.maxpool1(x)
-        # print(x.size())
 
         x = F.relu(self.conv2(x))
-        # print(x.size())
         x = self.maxpool2(x)
-        # print(x.size())
+
         x = F.relu(self.conv3(x))
-        # print(x.size())
         x = self.maxpool3(x)
 
         x = self.flat(x)
@@ -50,7 +46,7 @@ class createNetwork(nn.Module):
 
 
 class DeepQLearning:
-    def __init__(self, env, gamma, epsilon, epsilon_decay, epsilon_end, lr, TAU, replayBufferSize, batchReplayBufferSize, numberEpisodes):
+    def __init__(self, env, gamma, epsilon, epsilon_decay, epsilon_end, lr, TAU, replayBufferSize, batchReplayBufferSize, numberEpisodes, load_model = True):
         '''
         env : This is the environment.
         gamma : Discount Factor.
@@ -81,6 +77,9 @@ class DeepQLearning:
         self.device = 'cpu'
         self.onlineNetwork = createNetwork().to(self.device)
         self.targetNetwork = createNetwork().to(self.device)
+        if load_model == True:
+            self.onlineNetwork.load_state_dict(torch.load('models/DQ_1.pt')) # Setting the weights of online network -> target network 
+
         self.targetNetwork.load_state_dict(self.onlineNetwork.state_dict()) # Setting the weights of online network -> target network 
 
         self.loss_fn = nn.MSELoss()
@@ -182,7 +181,7 @@ class DeepQLearning:
         plt.show()
 
 if __name__ == "__main__":
-    x = torch.rand(1,3,200,1052)
+    x = torch.rand(1,1,119,384)
     model = createNetwork()
     st = time.time()
     x = model(x)
