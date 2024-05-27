@@ -44,9 +44,8 @@ class createNetwork(nn.Module):
         x = self.output(x)
         return x
 
-
 class DeepQLearning:
-    def __init__(self, env, gamma, epsilon, epsilon_decay, epsilon_end, lr, TAU, replayBufferSize, batchReplayBufferSize, numberEpisodes, load_model = True):
+    def __init__(self, env, gamma, epsilon, epsilon_decay, epsilon_end, lr, TAU, replayBufferSize, batchReplayBufferSize, numberEpisodes, load_model = False):
         '''
         env : This is the environment.
         gamma : Discount Factor.

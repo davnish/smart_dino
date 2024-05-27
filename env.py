@@ -12,7 +12,7 @@ class WebDino:
     def __init__(self):
         
         self.driver = webdriver.Chrome()
-        self.driver.set_window_size(600, 150)
+        self.driver.set_window_size(600, 236)
         try: self.driver.get("chrome://dino")
         except WebDriverException: pass
 
@@ -36,7 +36,7 @@ class WebDino:
     def step(self, action):
         self.timeStamp += 1
         self.takeAction(action)
-        # time.sleep(0.01)
+        time.sleep(0.001)
         state = self.returnState()
         terminated = self.isTerminated(state)
         reward = self.reward(terminated, action)
@@ -60,12 +60,15 @@ class WebDino:
         else: return False
     
     def stateClipUnsqueeze(self, state):
-        return np.expand_dims(state[41:160, 27:410], axis = 0)
+        state = np.expand_dims(state[41:160, 27:410], axis = 0)
+        timeStamp = np.zeros((1, 119, 1))
+        timeStamp[0,0,0] = self.timeStamp
+        state = np.concatenate([state, timeStamp], axis = -1)
+        return state
     
     def reward(self, terminated, action):
         reward = 0
         if terminated: reward -= -10
-        if action == 1: reward += -5
         reward += 1
         return reward
     
@@ -79,7 +82,7 @@ class WebDino:
                 if not terminated:
                     plt.imshow(np.int32(currState.transpose(1,2,0)))
                     plt.savefig(f'misc/img/dino_{self.timeStamp}') 
-                print(currState.shape)
+                # print(currState.shape)
                 # break 
             # break
             print(f"Score: {self.timeStamp}")

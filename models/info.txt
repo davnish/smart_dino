@@ -1,16 +1,16 @@
 * DQ_1
-    Episode : 500
-    Time : 38s
+    Episode : 1000
+    Time : 14345s
     Ep_Solved : 242
-    High_Score : 0
-    avg_intv : 20
-* DQ_2 
+    High_Score : 177
+    avg_intv : 103
+* DQ_2 : After Adding the timeStamp
     Episode : 1000
     Time : 110s
     Ep_Solved : 187
     High_Score : 39
     avg_intv : 40
-* DQ_3
+* DQ_3 : After state conversion
     Episode : 1500
     Time : 306s
     Ep_Solved : 595
