@@ -9,8 +9,8 @@ if __name__ == "__main__":
 
     # Explanation of every hyperparameter is in the docstirng of `DeepQLearning` class
     # Hyperparameters ###########
-    model_no = 2
-    numberEpisodes = 1000
+    model_no = 3
+    numberEpisodes = 1500
     gamma = 0.99
     epsilon = 1
     epsilon_decay = 0.995 # Changing this from 0.995
@@ -32,5 +32,4 @@ if __name__ == "__main__":
     end = time.time()
     print(f'Time: {end - start}')
     torch.save(dqn.onlineNetwork.state_dict(), os.path.join('models', f'DQ_{model_no}.pt')) # Saving the model
-    # dqn.simulateStrategy(env)
     dqn.plotRewards(model_no, avg_intv=4)

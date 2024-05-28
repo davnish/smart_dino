@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import WebDriverException
-# from PIL import Image
 import cv2 as cv
 import numpy as np
 import time
@@ -61,7 +60,7 @@ class WebDino:
     
     def stateClipUnsqueeze(self, state):
         state = np.expand_dims(state[41:160, 27:410], axis = 0)
-        timeStamp = np.zeros((1, 119, 1))
+        timeStamp = np.zeros((1, 119, 1)).astype('float32')
         timeStamp[0,0,0] = self.timeStamp
         state = np.concatenate([state, timeStamp], axis = -1)
         return state
@@ -71,6 +70,12 @@ class WebDino:
         if terminated: reward -= -10
         reward += 1
         return reward
+    
+    def rescaleState(state, rescale_factor = 0.50):
+        width = int(state.shape[0]*rescale_factor)
+        height = int(state.shape[1]*rescale_factor)
+        dimension = (width, height)
+        return cv.resize(state, dimension, interpolation=cv.INTER_AREA)
     
     def Simulate(self, games=3):
         for _ in range(games):

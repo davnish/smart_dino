@@ -15,17 +15,15 @@ torch.manual_seed(42)
 class createNetwork(nn.Module):
     def __init__(self):
         super(createNetwork,self).__init__()
-        self.conv1 = nn.Conv2d(1,8, kernel_size=(3,3))   
-        self.maxpool1 = nn.MaxPool2d(3) 
+        self.conv1 = nn.Conv2d(1,16, kernel_size=(3,3),stride = 2)   
+        self.maxpool1 = nn.MaxPool2d(3, stride = 2) 
         
-        self.conv2 = nn.Conv2d(8,16, kernel_size=(3,3))    
-        self.maxpool2 = nn.MaxPool2d(3)
-                
-        self.conv3 = nn.Conv2d(16, 32, kernel_size=(3,3)) 
-        self.maxpool3 = nn.MaxPool2d(3)
+        self.conv2 = nn.Conv2d(16,32, kernel_size=(3,3), stride = 2)    
+        self.maxpool2 = nn.MaxPool2d(3, stride = 2)
 
         self.flat = nn.Flatten()
-        self.l1 = nn.Linear(1248, 512)
+        self.l1 = nn.Linear(4416, 1024)
+        self.l2 = nn.Linear(1024, 512)
         self.output = nn.Linear(512, 2)
     
     def forward(self, x):
@@ -36,11 +34,9 @@ class createNetwork(nn.Module):
         x = F.relu(self.conv2(x))
         x = self.maxpool2(x)
 
-        x = F.relu(self.conv3(x))
-        x = self.maxpool3(x)
-
         x = self.flat(x)
         x = F.relu(self.l1(x))
+        x = F.relu(self.l2(x))
         x = self.output(x)
         return x
 

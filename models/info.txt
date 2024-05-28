@@ -6,12 +6,12 @@
     avg_intv : 103
 * DQ_2 : After Adding the timeStamp
     Episode : 1000
-    Time : 110s
-    Ep_Solved : 187
-    High_Score : 39
+    Time : 10956s
+    Ep_Solved : 36
+    High_Score : 6
     avg_intv : 40
-* DQ_3 : After state conversion
-    Episode : 1500
+* DQ_3 : Still the timeStamp array is added but only the first pixel has the timeStamp value.
+    Episode : 1000
     Time : 306s
     Ep_Solved : 595
     High_Score : 263
