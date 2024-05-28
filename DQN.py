@@ -15,16 +15,16 @@ torch.manual_seed(42)
 class createNetwork(nn.Module):
     def __init__(self):
         super(createNetwork,self).__init__()
-        self.conv1 = nn.Conv2d(1,16, kernel_size=(3,3),stride = 2)   
-        self.maxpool1 = nn.MaxPool2d(3, stride = 2) 
+        self.conv1 = nn.Conv2d(1,16, kernel_size=(3,3))   
+        self.maxpool1 = nn.MaxPool2d(3) 
         
-        self.conv2 = nn.Conv2d(16,32, kernel_size=(3,3), stride = 2)    
-        self.maxpool2 = nn.MaxPool2d(3, stride = 2)
+        self.conv2 = nn.Conv2d(16,32, kernel_size=(3,3))    
+        self.maxpool2 = nn.MaxPool2d(3)
 
         self.flat = nn.Flatten()
-        self.l1 = nn.Linear(4416, 1024)
-        self.l2 = nn.Linear(1024, 512)
-        self.output = nn.Linear(512, 2)
+        self.l1 = nn.Linear(224, 128)
+        self.l2 = nn.Linear(128, 64)
+        self.output = nn.Linear(64, 2)
     
     def forward(self, x):
 
@@ -176,7 +176,7 @@ class DeepQLearning:
         plt.show()
 
 if __name__ == "__main__":
-    x = torch.rand(1,1,119,384)
+    x = torch.rand(1,1,23,76)
     model = createNetwork()
     st = time.time()
     x = model(x)

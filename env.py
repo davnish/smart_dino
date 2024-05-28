@@ -29,18 +29,23 @@ class WebDino:
         self.timeStamp = 0
         self.takeAction(1)
         time.sleep(3.5)
-        state = self.stateClipUnsqueeze(self.returnState())
-        return state
+        self.state = self.returnState()
+        self.stateClip()
+        return self.state
 
     def step(self, action):
         self.timeStamp += 1
         self.takeAction(action)
-        time.sleep(0.001)
-        state = self.returnState()
-        terminated = self.isTerminated(state)
-        reward = self.reward(terminated, action)
-        stateClipped = self.stateClipUnsqueeze(state)
-        return stateClipped, reward, terminated
+        # time.sleep(0.001)
+        self.state = self.returnState()
+        self.terminated = self.isTerminated()
+        reward = self.stateReward()
+        self.stateClip()
+        self.rescaleState()
+        # AddtimeStamp
+        # self.addTimeStamp()
+        self.expandim()
+        return self.state, reward, self.terminated
     
     def takeAction(self, action):
         if action == 1: self.element.send_keys(Keys.SPACE)
@@ -52,30 +57,36 @@ class WebDino:
         _, state = cv.threshold(state, 100, 255, cv.THRESH_BINARY)
         return state
     
-    def isTerminated(self, state):
-        if state[70, 323] + state[73, 345] + state[70, 368] + state[74, 400] == 1020:
+    def isTerminated(self):
+        if self.state[70, 323] + self.state[73, 345] + self.state[70, 368] + self.state[74, 400] == 1020:
             time.sleep(2)
             return True
         else: return False
     
-    def stateClipUnsqueeze(self, state):
-        state = np.expand_dims(state[41:160, 27:410], axis = 0)
-        timeStamp = np.zeros((1, 119, 1)).astype('float32')
-        timeStamp[0,0,0] = self.timeStamp
-        state = np.concatenate([state, timeStamp], axis = -1)
-        return state
+    def stateClip(self):
+        self.state = self.state[41:160, 27:410]
     
-    def reward(self, terminated, action):
+    def addTimeStamp(self):
+        timeStamp = np.zeros((119, 1)).astype('float32')
+        timeStamp[0,0,0] = self.timeStamp
+        self.state = np.concatenate([self.state, timeStamp], axis = -1)
+    
+    def expandim(self):
+        self.state = np.expand_dims(self.state, axis = 0)
+    
+    def stateReward(self):
         reward = 0
-        if terminated: reward -= -10
+        if self.terminated: reward -= -10
         reward += 1
         return reward
     
-    def rescaleState(state, rescale_factor = 0.50):
-        width = int(state.shape[0]*rescale_factor)
-        height = int(state.shape[1]*rescale_factor)
-        dimension = (width, height)
-        return cv.resize(state, dimension, interpolation=cv.INTER_AREA)
+    def rescaleState(self, rescale_factor = 0.2):
+        # print(self.state.shape)
+        width = int(self.state.shape[1]*rescale_factor)
+        height = int(self.state.shape[0]*rescale_factor)
+        dimensions = (width, height)
+        print(dimensions)
+        self.state = cv.resize(self.state, dimensions, interpolation=cv.INTER_AREA)
     
     def Simulate(self, games=3):
         for _ in range(games):
@@ -85,8 +96,9 @@ class WebDino:
                 action = np.random.choice(self.action_space)
                 currState, reward, terminated = self.step(action)
                 if not terminated:
-                    plt.imshow(np.int32(currState.transpose(1,2,0)))
+                    plt.imshow(np.int32(currState.transpose(1,2,0)), cmap='grey')
                     plt.savefig(f'misc/img/dino_{self.timeStamp}') 
+                    plt.show()
                 # print(currState.shape)
                 # break 
             # break
