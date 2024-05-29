@@ -1,5 +1,0 @@
-print(n.shape)
-# print(arr.shape)
-# arr = np.concatenate([arr, n], axis = 2)
-# print(n)
-# print(arr)

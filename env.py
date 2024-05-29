@@ -31,6 +31,9 @@ class WebDino:
         time.sleep(3.5)
         self.state = self.returnState()
         self.stateClip()
+        self.rescaleState()
+        # self.addTimeStamp()
+        self.expandim()
         return self.state
 
     def step(self, action):
@@ -42,7 +45,6 @@ class WebDino:
         reward = self.stateReward()
         self.stateClip()
         self.rescaleState()
-        # AddtimeStamp
         # self.addTimeStamp()
         self.expandim()
         return self.state, reward, self.terminated
@@ -67,8 +69,8 @@ class WebDino:
         self.state = self.state[41:160, 27:410]
     
     def addTimeStamp(self):
-        timeStamp = np.zeros((119, 1)).astype('float32')
-        timeStamp[0,0,0] = self.timeStamp
+        timeStamp = np.zeros((23, 1)).astype('float32')
+        timeStamp[0,0] = self.timeStamp
         self.state = np.concatenate([self.state, timeStamp], axis = -1)
     
     def expandim(self):
@@ -81,11 +83,11 @@ class WebDino:
         return reward
     
     def rescaleState(self, rescale_factor = 0.2):
-        # print(self.state.shape)
+
         width = int(self.state.shape[1]*rescale_factor)
         height = int(self.state.shape[0]*rescale_factor)
         dimensions = (width, height)
-        print(dimensions)
+
         self.state = cv.resize(self.state, dimensions, interpolation=cv.INTER_AREA)
     
     def Simulate(self, games=3):
@@ -95,10 +97,10 @@ class WebDino:
             while not terminated:
                 action = np.random.choice(self.action_space)
                 currState, reward, terminated = self.step(action)
-                if not terminated:
-                    plt.imshow(np.int32(currState.transpose(1,2,0)), cmap='grey')
-                    plt.savefig(f'misc/img/dino_{self.timeStamp}') 
-                    plt.show()
+                # if not terminated:
+                plt.imshow(np.int32(currState.transpose(1,2,0)), cmap='grey')
+                plt.savefig(f'misc/img/dino_{self.timeStamp}') 
+                    # plt.show()
                 # print(currState.shape)
                 # break 
             # break

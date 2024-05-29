@@ -10,7 +10,9 @@
     Ep_Solved : 36
     High_Score : 6
     avg_intv : 40
-* DQ_3 : Rescaling the state to 0.2% before sending it to model, Added a new model with 2 conv layers and 2 linear layers.
+* DQ_3 : 
+    - Rescaling the state to 0.2% before sending it to model, Added a new model with 2 conv layers and 2 linear layers.
+    - Removed TimeStamp for now 
     Episode : 1000
     Time : 306s
     Ep_Solved : 595

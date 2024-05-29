@@ -15,16 +15,19 @@ torch.manual_seed(42)
 class createNetwork(nn.Module):
     def __init__(self):
         super(createNetwork,self).__init__()
-        self.conv1 = nn.Conv2d(1,16, kernel_size=(3,3))   
-        self.maxpool1 = nn.MaxPool2d(3) 
+        self.conv1 = nn.Conv2d(4,16, kernel_size=(2,2))   
+        self.maxpool1 = nn.MaxPool2d(2) 
         
-        self.conv2 = nn.Conv2d(16,32, kernel_size=(3,3))    
-        self.maxpool2 = nn.MaxPool2d(3)
+        self.conv2 = nn.Conv2d(16,32, kernel_size=(2,2))    
+        self.maxpool2 = nn.MaxPool2d(2)
+        
+        self.conv3 = nn.Conv2d(32,64, kernel_size=(2,2))    
+        self.maxpool3 = nn.MaxPool2d(2)
 
         self.flat = nn.Flatten()
-        self.l1 = nn.Linear(224, 128)
-        self.l2 = nn.Linear(128, 64)
-        self.output = nn.Linear(64, 2)
+        self.l1 = nn.Linear(1024, 512)
+        self.l2 = nn.Linear(512, 128)
+        self.output = nn.Linear(128, 2)
     
     def forward(self, x):
 
@@ -33,6 +36,9 @@ class createNetwork(nn.Module):
 
         x = F.relu(self.conv2(x))
         x = self.maxpool2(x)
+
+        x = F.relu(self.conv3(x))
+        x = self.maxpool3(x)
 
         x = self.flat(x)
         x = F.relu(self.l1(x))
@@ -86,11 +92,19 @@ class DeepQLearning:
 
             rewardsEpisode = 0
             currState = torch.tensor(self.env.reset()) # Converting to tensor
+
+            #  Stacking 4 Consecutive Screenshots, As this is our reset position so this will act as a placeholder
+            currState = currState.repeat(4,1,1)
+
+
             terminated = False
             while not terminated: # A timeStamp restriciton is for any episode taking more than 1000 states
                 currAction = self.selectAction(currState.unsqueeze(0), indexEpisode)
                 nxtState, reward, terminated = self.env.step(currAction)
                 nxtState = torch.tensor(nxtState)
+                
+                nxtState = torch.concat([nxtState, currState[:3]], dim = 0) # Concatinating 4 Consequetive images
+
                 self.replayBuffer.append((currState, currAction, reward, nxtState, terminated)) # Converting the nxtState to tensor
                 self.trainNetwork()
                 currState = nxtState
@@ -176,7 +190,7 @@ class DeepQLearning:
         plt.show()
 
 if __name__ == "__main__":
-    x = torch.rand(1,1,23,76)
+    x = torch.rand(1,4,23,76)
     model = createNetwork()
     st = time.time()
     x = model(x)

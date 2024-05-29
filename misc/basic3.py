@@ -21,13 +21,14 @@ time.sleep(2)
 # Send space key to start the game
 body = driver.find_element(By.TAG_NAME, "body")
 body.send_keys(Keys.SPACE)
-
+canvas = driver.find_element(By.CLASS_NAME, "runner-canvas")
+import io
 # Time for over_1
 time.sleep(5.5)
 for i in range(100):
-    body.screenshot(f'over/over_{i}.png')
+    io.BytesIO((canvas.get_screenshot_as_base64())
 time.sleep(1.5)
-body.screenshot('over_2.png')
+canvas.screenshot('over_5.png')
 # time.sleep(5)
 
 # Check if the game over message is displayed
