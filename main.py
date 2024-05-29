@@ -20,7 +20,7 @@ if __name__ == "__main__":
     lr = 1e-4
     TAU = 0.001
     replayBufferSize = 10000
-    batchReplayBufferSize = 32
+    batchReplayBufferSize = 16
     save_freq = 100
     #############################
 
