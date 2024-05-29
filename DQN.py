@@ -9,6 +9,7 @@ import pandas as pd
 import random
 import time
 import os
+import glob
 random.seed(42)
 torch.manual_seed(42)
 
@@ -47,7 +48,7 @@ class createNetwork(nn.Module):
         return x
 
 class DeepQLearning:
-    def __init__(self, env, gamma, epsilon, epsilon_decay, epsilon_end, lr, TAU, replayBufferSize, batchReplayBufferSize, numberEpisodes, load_model = False):
+    def __init__(self, env, gamma, epsilon, epsilon_decay, epsilon_end, lr, TAU, replayBufferSize, batchReplayBufferSize, numberEpisodes, save_freq, model_no, load_model = False):
         '''
         env : This is the environment.
         gamma : Discount Factor.
@@ -73,13 +74,17 @@ class DeepQLearning:
         self.batchReplayBufferSize = batchReplayBufferSize
         self.replayBuffer=deque(maxlen=self.replayBufferSize)
         self.sumRewardsEpisode = [] # A list of rewards of every episodes
+        self.save_freq = save_freq
+        self.model_no = model_no
 
         # self.device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu' # If You want to use gpu uncommnet this
         self.device = 'cpu'
         self.onlineNetwork = createNetwork().to(self.device)
         self.targetNetwork = createNetwork().to(self.device)
+
         if load_model == True:
-            self.onlineNetwork.load_state_dict(torch.load('models/DQ_1.pt')) # Setting the weights of online network -> target network 
+            recent_episode = self.recent_episode()
+            self.onlineNetwork.load_state_dict(torch.load(f'models/DQ_{self.model_no}/ckpt_{recent_episode}.pt')) # Setting the weights of online network -> target network 
 
         self.targetNetwork.load_state_dict(self.onlineNetwork.state_dict()) # Setting the weights of online network -> target network 
 
@@ -88,7 +93,7 @@ class DeepQLearning:
     
     def trainigEpisodes(self):
 
-        for indexEpisode in range(self.numberEpisodes):
+        for indexEpisode in range(1, self.numberEpisodes+1):
 
             rewardsEpisode = 0
             currState = torch.tensor(self.env.reset()) # Converting to tensor
@@ -99,7 +104,7 @@ class DeepQLearning:
 
             terminated = False
             while not terminated: # A timeStamp restriciton is for any episode taking more than 1000 states
-                currAction = self.selectAction(currState.unsqueeze(0), indexEpisode)
+                currAction = self.selectAction(currState.unsqueeze(0))
                 nxtState, reward, terminated = self.env.step(currAction)
                 nxtState = torch.tensor(nxtState)
                 
@@ -119,10 +124,12 @@ class DeepQLearning:
 
             print(f"Episode: {indexEpisode}, Reward: {rewardsEpisode}")
             self.sumRewardsEpisode.append(rewardsEpisode)
-
             self.epsilon = max(self.epsilon_end, self.epsilon * self.epsilon_decay)
+
+            if indexEpisode%self.save_freq == 0:
+                self.save_progress(indexEpisode)
   
-    def selectAction(self, currState, indexEpisode):
+    def selectAction(self, currState):
         if torch.rand(1).item() < self.epsilon:
             return np.random.choice(self.env.action_space)
         else:
@@ -187,7 +194,23 @@ class DeepQLearning:
         plt.ylabel('Reward')
         # plt.yscale('log') 
         plt.savefig(os.path.join('results', f'DQ_{model_no}'))
-        plt.show()
+        # plt.show()
+
+
+    def save_progress(self, episode):
+        path = os.path.join("models", f"DQ_{self.model_no}")
+        if not os.path.exists(os.path.join('models', f'DQ_{self.model_no}')):
+            os.makedirs(path)
+        mx = self.recent_episode()
+        torch.save(self.onlineNetwork.state_dict(), os.path.join(path, f"ckpt_{self.save_freq+mx}.pt"))
+        print(f"Model Saved at {episode} episodes, named: ckpt_{self.save_freq+mx}.pt")
+
+    def recent_episode(self):
+        mx = 0
+        for x in glob.glob(os.path.join("models", f"DQ_{self.model_no}", f"ckpt_*.pt")):
+            n = int(x.split('_')[-1].split('.')[-2])
+            mx = n if mx<n else mx
+        return mx
 
 if __name__ == "__main__":
     x = torch.rand(1,4,23,76)

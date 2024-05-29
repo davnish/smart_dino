@@ -1,8 +1,10 @@
 from env import WebDino
 from DQN import DeepQLearning
+import pandas as pd
 import torch
 import time
 import os
+import glob
 
 
 if __name__ == "__main__":
@@ -10,7 +12,7 @@ if __name__ == "__main__":
     # Explanation of every hyperparameter is in the docstirng of `DeepQLearning` class
     # Hyperparameters ###########
     model_no = 3
-    numberEpisodes = 1000
+    numberEpisodes = 5
     gamma = 0.99
     epsilon = 1
     epsilon_decay = 0.995 # Changing this from 0.995
@@ -19,6 +21,7 @@ if __name__ == "__main__":
     TAU = 0.001
     replayBufferSize = 20000
     batchReplayBufferSize = 32
+    save_freq = 2
     #############################
 
     env = WebDino()
@@ -26,10 +29,10 @@ if __name__ == "__main__":
 
     dqn = DeepQLearning(env, gamma=gamma, epsilon=epsilon, epsilon_decay=epsilon_decay, 
                         epsilon_end=epsilon_end, lr = lr, replayBufferSize=replayBufferSize, 
-                        batchReplayBufferSize=batchReplayBufferSize, TAU=TAU, numberEpisodes=numberEpisodes)
+                        batchReplayBufferSize=batchReplayBufferSize, TAU=TAU, numberEpisodes=numberEpisodes, model_no=model_no, save_freq = save_freq)
     start = time.time()
     dqn.trainigEpisodes()
     end = time.time()
     print(f'Time: {end - start}')
-    torch.save(dqn.onlineNetwork.state_dict(), os.path.join('models', f'DQ_{model_no}.pt')) # Saving the model
+    torch.save(dqn.onlineNetwork.state_dict(), os.path.join('models', f'DQ_{model_no}', f'ckpt_{numberEpisodes}.pt')) # Saving the model
     dqn.plotRewards(model_no, avg_intv=4)
