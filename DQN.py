@@ -26,9 +26,9 @@ class createNetwork(nn.Module):
         self.maxpool3 = nn.MaxPool2d(2)
 
         self.flat = nn.Flatten()
-        self.l1 = nn.Linear(1024, 512)
-        self.l2 = nn.Linear(512, 128)
-        self.output = nn.Linear(128, 2)
+        self.l1 = nn.Linear(6528, 1024)
+        self.l2 = nn.Linear(1024, 512)
+        self.output = nn.Linear(512, 2)
     
     def forward(self, x):
 
@@ -213,7 +213,7 @@ class DeepQLearning:
         return mx
 
 if __name__ == "__main__":
-    x = torch.rand(1,4,23,76)
+    x = torch.rand(1,4,59,146)
     model = createNetwork()
     st = time.time()
     x = model(x)

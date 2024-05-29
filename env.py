@@ -66,7 +66,7 @@ class WebDino:
         else: return False
     
     def stateClip(self):
-        self.state = self.state[41:160, 27:410]
+        self.state = self.state[41:160, 27:320]
     
     def addTimeStamp(self):
         timeStamp = np.zeros((23, 1)).astype('float32')
@@ -82,12 +82,12 @@ class WebDino:
         reward += 1
         return reward
     
-    def rescaleState(self, rescale_factor = 0.2):
+    def rescaleState(self, rescale_factor = 0.5):
 
         width = int(self.state.shape[1]*rescale_factor)
         height = int(self.state.shape[0]*rescale_factor)
         dimensions = (width, height)
-
+        print(dimensions)
         self.state = cv.resize(self.state, dimensions, interpolation=cv.INTER_AREA)
     
     def Simulate(self, games=3):
@@ -103,7 +103,7 @@ class WebDino:
                     # plt.show()
                 # print(currState.shape)
                 # break 
-            # break
+            break
             print(f"Score: {self.timeStamp}")
         self.driver.quit()
 
