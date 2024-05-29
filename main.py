@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # Explanation of every hyperparameter is in the docstirng of `DeepQLearning` class
     # Hyperparameters ###########
     model_no = 3
-    numberEpisodes = 5
+    numberEpisodes = 1000
     gamma = 0.99
     epsilon = 1
     epsilon_decay = 0.995 # Changing this from 0.995
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     TAU = 0.001
     replayBufferSize = 20000
     batchReplayBufferSize = 32
-    save_freq = 2
+    save_freq = 100
     #############################
 
     env = WebDino()
