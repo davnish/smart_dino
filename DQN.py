@@ -16,19 +16,19 @@ torch.manual_seed(42)
 class createNetwork(nn.Module):
     def __init__(self):
         super(createNetwork,self).__init__()
-        self.conv1 = nn.Conv2d(4,16, kernel_size=(2,2))   
-        self.maxpool1 = nn.MaxPool2d(2) 
+        self.conv1 = nn.Conv2d(4,16, kernel_size=(3,3))   
+        self.maxpool1 = nn.MaxPool2d(3) 
         
-        self.conv2 = nn.Conv2d(16,32, kernel_size=(2,2))    
-        self.maxpool2 = nn.MaxPool2d(2)
+        self.conv2 = nn.Conv2d(16,32, kernel_size=(3,3))    
+        self.maxpool2 = nn.MaxPool2d(3)
         
-        self.conv3 = nn.Conv2d(32,64, kernel_size=(2,2))    
-        self.maxpool3 = nn.MaxPool2d(2)
+        self.conv3 = nn.Conv2d(32,64, kernel_size=(3,3))    
+        self.maxpool3 = nn.MaxPool2d(3)
 
         self.flat = nn.Flatten()
-        self.l1 = nn.Linear(6528, 1024)
-        self.l2 = nn.Linear(1024, 512)
-        self.output = nn.Linear(512, 2)
+        self.l1 = nn.Linear(256, 128)
+        self.l2 = nn.Linear(128, 64)
+        self.output = nn.Linear(64, 2)
     
     def forward(self, x):
 
@@ -84,6 +84,7 @@ class DeepQLearning:
 
         if load_model == True:
             recent_episode = self.recent_episode()
+            print(f'Loaded Checkpoint: {recent_episode}')
             self.onlineNetwork.load_state_dict(torch.load(f'models/DQ_{self.model_no}/ckpt_{recent_episode}.pt')) # Setting the weights of online network -> target network 
 
         self.targetNetwork.load_state_dict(self.onlineNetwork.state_dict()) # Setting the weights of online network -> target network 

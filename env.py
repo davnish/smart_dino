@@ -56,7 +56,11 @@ class WebDino:
     def returnState(self):
         self.element.screenshot('dino.png') 
         state = cv.imread('dino.png', cv.IMREAD_GRAYSCALE).astype('float32')
-        _, state = cv.threshold(state, 100, 255, cv.THRESH_BINARY)
+        stateUnique = np.unique(state, return_counts = True)
+        if stateUnique[0][np.argmax(stateUnique[1])] == 255:
+            _, state = cv.threshold(state, 100, 255, cv.THRESH_BINARY_INV)
+        else:
+            _, state = cv.threshold(state, 100, 255, cv.THRESH_BINARY)
         return state
     
     def isTerminated(self):
@@ -87,7 +91,6 @@ class WebDino:
         width = int(self.state.shape[1]*rescale_factor)
         height = int(self.state.shape[0]*rescale_factor)
         dimensions = (width, height)
-        print(dimensions)
         self.state = cv.resize(self.state, dimensions, interpolation=cv.INTER_AREA)
     
     def Simulate(self, games=3):

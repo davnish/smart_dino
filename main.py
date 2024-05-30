@@ -14,12 +14,12 @@ if __name__ == "__main__":
     model_no = 4
     numberEpisodes = 1000
     gamma = 0.99
-    epsilon = 1
+    epsilon = 0.1
     epsilon_decay = 0.995 # Changing this from 0.995
-    epsilon_end = 0.05 # Changing this from 0.05
+    epsilon_end = 0.01 # Changing this from 0.05
     lr = 1e-4
     TAU = 0.001
-    replayBufferSize = 10000
+    replayBufferSize = 30000
     batchReplayBufferSize = 16
     save_freq = 100
     #############################
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     dqn = DeepQLearning(env, gamma=gamma, epsilon=epsilon, epsilon_decay=epsilon_decay, 
                         epsilon_end=epsilon_end, lr = lr, replayBufferSize=replayBufferSize, 
-                        batchReplayBufferSize=batchReplayBufferSize, TAU=TAU, numberEpisodes=numberEpisodes, model_no=model_no, save_freq = save_freq)
+                        batchReplayBufferSize=batchReplayBufferSize, TAU=TAU, numberEpisodes=numberEpisodes, model_no=model_no, save_freq = save_freq, load_model=True)
     start = time.time()
     dqn.trainigEpisodes()
     end = time.time()
