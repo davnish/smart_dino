@@ -76,16 +76,16 @@ class DeepQLearning:
         self.sumRewardsEpisode = [] # A list of rewards of every episodes
         self.save_freq = save_freq
         self.model_no = model_no
-
+        self.st_episode = self.recent_episode()
         # self.device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu' # If You want to use gpu uncommnet this
         self.device = 'cpu'
         self.onlineNetwork = createNetwork().to(self.device)
         self.targetNetwork = createNetwork().to(self.device)
 
         if load_model == True:
-            recent_episode = self.recent_episode()
-            print(f'Loaded Checkpoint: {recent_episode}')
-            self.onlineNetwork.load_state_dict(torch.load(f'models/DQ_{self.model_no}/ckpt_{recent_episode}.pt')) # Setting the weights of online network -> target network 
+            
+            print(f'Loaded Checkpoint: {self.st_episode}')
+            self.onlineNetwork.load_state_dict(torch.load(f'models/DQ_{self.model_no}/ckpt_{st._episode}.pt')) # Setting the weights of online network -> target network 
 
         self.targetNetwork.load_state_dict(self.onlineNetwork.state_dict()) # Setting the weights of online network -> target network 
 
@@ -94,7 +94,7 @@ class DeepQLearning:
     
     def trainigEpisodes(self):
 
-        for indexEpisode in range(1, self.numberEpisodes+1):
+        for indexEpisode in range(self.st_episode+1, self.st_episode+self.numberEpisodes+1):
 
             rewardsEpisode = 0
             currState = torch.tensor(self.env.reset()) # Converting to tensor
