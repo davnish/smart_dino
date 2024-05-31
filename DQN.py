@@ -81,11 +81,16 @@ class DeepQLearning:
         self.device = 'cpu'
         self.onlineNetwork = createNetwork().to(self.device)
         self.targetNetwork = createNetwork().to(self.device)
-
-        if load_model == True:
-            
-            print(f'Loaded Checkpoint: {self.st_episode}')
-            self.onlineNetwork.load_state_dict(torch.load(f'models/DQ_{self.model_no}/ckpt_{st._episode}.pt')) # Setting the weights of online network -> target network 
+    
+        try:
+            if load_model == True:
+                print(f'Loaded Checkpoint: {self.st_episode}')
+                self.onlineNetwork.load_state_dict(torch.load(f'models/DQ_{self.model_no}/ckpt_{self.st_episode}.pt')) # Setting the weights of online network -> target network 
+        except Exception as e:
+            print(e)
+            ans = input('Do you want to continue without checkpoint (y/n): ')
+            if ans == 'n':
+                quit()
 
         self.targetNetwork.load_state_dict(self.onlineNetwork.state_dict()) # Setting the weights of online network -> target network 
 

@@ -5,12 +5,14 @@ from selenium.common.exceptions import WebDriverException
 import cv2 as cv
 import numpy as np
 import time
+from PIL import ImageGrab
 import matplotlib.pyplot as plt
 
 class WebDino:
     def __init__(self):
         
         self.driver = webdriver.Chrome()
+        self.driver.set_window_position(50,200)
         self.driver.set_window_size(600, 236)
         try: self.driver.get("chrome://dino")
         except WebDriverException: pass
@@ -51,23 +53,18 @@ class WebDino:
     
     def takeAction(self, action):
         if action == 1: self.element.send_keys(Keys.SPACE)
-        # elif action == 2: self.element.send_keys(Keys.ARROW_DOWN)
 
     def returnState(self):
-        self.element.screenshot('dino.png') 
-        state = cv.imread('dino.png', cv.IMREAD_GRAYSCALE).astype('float32')
-        stateUnique = np.unique(state, return_counts = True)
-        if stateUnique[0][np.argmax(stateUnique[1])] == 255:
-            _, state = cv.threshold(state, 100, 255, cv.THRESH_BINARY_INV)
-        else:
-            _, state = cv.threshold(state, 100, 255, cv.THRESH_BINARY)
-        return state
+        # self.element.screenshot('dino.png') 
+        state = ImageGrab.grab(bbox = (50, 340, 650, 576)).convert('L')
+        # if self.timeStamp == 0:
+        #     state.show()
+        # state = cv.imread('dino.png', cv.IMREAD_GRAYSCALE)
+        state = cv.Canny(np.asarray(state), 100, 200)
+        return state.astype('float32')
     
     def isTerminated(self):
-        if self.state[70, 323] + self.state[73, 345] + self.state[70, 368] + self.state[74, 400] == 1020:
-            time.sleep(2)
-            return True
-        else: return False
+        return self.driver.execute_script("return Runner.instance_.crashed")
     
     def stateClip(self):
         self.state = self.state[41:160, 27:320]
@@ -100,19 +97,19 @@ class WebDino:
             while not terminated:
                 action = np.random.choice(self.action_space)
                 currState, reward, terminated = self.step(action)
+                ###############
                 # if not terminated:
                 plt.imshow(np.int32(currState.transpose(1,2,0)), cmap='grey')
-                plt.savefig(f'misc/img/dino_{self.timeStamp}') 
-                    # plt.show()
+                plt.axis('off')
+                plt.savefig(f'misc/trans_inv/dino_{self.timeStamp}', bbox_inches = 'tight', pad_inches = 0) 
+                ###############
+                # plt.show()
                 # print(currState.shape)
                 # break 
-            break
             print(f"Score: {self.timeStamp}")
+            break
         self.driver.quit()
 
 if __name__ == "__main__":
     dino = WebDino()
     dino.Simulate(games = 10)
-
-    #-----------------
-    # Some issues with terminations are still to be resolved.
