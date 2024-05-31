@@ -32,42 +32,35 @@ class WebDino:
         self.takeAction(1)
         time.sleep(3.5)
         self.state = self.returnState()
-        self.stateClip()
         self.rescaleState()
-        # self.addTimeStamp()
         self.expandim()
-        return self.state
+        return self.state.astype('float32')
 
     def step(self, action):
         self.timeStamp += 1
         self.takeAction(action)
-        # time.sleep(0.001)
         self.state = self.returnState()
         self.terminated = self.isTerminated()
         reward = self.stateReward()
-        self.stateClip()
         self.rescaleState()
-        # self.addTimeStamp()
         self.expandim()
-        return self.state, reward, self.terminated
+        return self.state.astype('float32'), reward, self.terminated
     
     def takeAction(self, action):
         if action == 1: self.element.send_keys(Keys.SPACE)
 
     def returnState(self):
-        state = np.asarray(ImageGrab.grab(bbox = (50, 340, 650, 576)).convert('L'))
+        state = np.asarray(ImageGrab.grab(bbox = (80, 400, 230, 500)).convert('L'))
         plt.imshow(state, cmap='grey')
         plt.axis('off')
         plt.savefig(f'misc/trans/dino_{self.timeStamp}', bbox_inches = 'tight', pad_inches = 0) 
 
-
         state = cv.Canny(state, 100, 200)
-        return state.astype('float32')
-    
+        return state
     def isTerminated(self):
         terminated = self.driver.execute_script("return Runner.instance_.crashed")
         if terminated:
-            time.sleep(1)
+            time.sleep(1.5)
         return terminated
     
     def stateClip(self):
@@ -87,7 +80,7 @@ class WebDino:
         reward += 1
         return reward
     
-    def rescaleState(self, rescale_factor = 0.5):
+    def rescaleState(self, rescale_factor = 0.6):
 
         width = int(self.state.shape[1]*rescale_factor)
         height = int(self.state.shape[0]*rescale_factor)
@@ -116,4 +109,4 @@ class WebDino:
 
 if __name__ == "__main__":
     dino = WebDino()
-    dino.Simulate(games = 10)
+    dino.Simulate(games = 100)
