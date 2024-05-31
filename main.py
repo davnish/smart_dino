@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     dqn = DeepQLearning(env, gamma=gamma, epsilon=epsilon, epsilon_decay=epsilon_decay, 
                         epsilon_end=epsilon_end, lr = lr, replayBufferSize=replayBufferSize, 
-                        batchReplayBufferSize=batchReplayBufferSize, TAU=TAU, numberEpisodes=numberEpisodes, model_no=model_no, save_freq = save_freq, load_model=True)
+                        batchReplayBufferSize=batchReplayBufferSize, TAU=TAU, numberEpisodes=numberEpisodes, model_no=model_no, save_freq = save_freq, load_model=False)
     start = time.time()
     dqn.trainigEpisodes()
     end = time.time()

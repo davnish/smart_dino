@@ -55,16 +55,20 @@ class WebDino:
         if action == 1: self.element.send_keys(Keys.SPACE)
 
     def returnState(self):
-        # self.element.screenshot('dino.png') 
-        state = ImageGrab.grab(bbox = (50, 340, 650, 576)).convert('L')
-        # if self.timeStamp == 0:
-        #     state.show()
-        # state = cv.imread('dino.png', cv.IMREAD_GRAYSCALE)
-        state = cv.Canny(np.asarray(state), 100, 200)
+        state = np.asarray(ImageGrab.grab(bbox = (50, 340, 650, 576)).convert('L'))
+        plt.imshow(state, cmap='grey')
+        plt.axis('off')
+        plt.savefig(f'misc/trans/dino_{self.timeStamp}', bbox_inches = 'tight', pad_inches = 0) 
+
+
+        state = cv.Canny(state, 100, 200)
         return state.astype('float32')
     
     def isTerminated(self):
-        return self.driver.execute_script("return Runner.instance_.crashed")
+        terminated = self.driver.execute_script("return Runner.instance_.crashed")
+        if terminated:
+            time.sleep(1)
+        return terminated
     
     def stateClip(self):
         self.state = self.state[41:160, 27:320]
@@ -107,7 +111,7 @@ class WebDino:
                 # print(currState.shape)
                 # break 
             print(f"Score: {self.timeStamp}")
-            break
+            # break
         self.driver.quit()
 
 if __name__ == "__main__":
