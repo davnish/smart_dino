@@ -1,12 +1,12 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import WebDriverException
 import cv2 as cv
 import numpy as np
 import time
 from PIL import ImageGrab
 import matplotlib.pyplot as plt
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import WebDriverException
 
 class WebDino:
     def __init__(self):
@@ -44,16 +44,17 @@ class WebDino:
         reward = self.stateReward()
         self.rescaleState()
         self.expandim()
+        # print(self.state.shape)
         return self.state.astype('float32'), reward, self.terminated
     
     def takeAction(self, action):
         if action == 1: self.element.send_keys(Keys.SPACE)
 
     def returnState(self):
-        state = np.asarray(ImageGrab.grab(bbox = (80, 400, 230, 500)).convert('L'))
-        plt.imshow(state, cmap='grey')
-        plt.axis('off')
-        plt.savefig(f'misc/trans/dino_{self.timeStamp}', bbox_inches = 'tight', pad_inches = 0) 
+        state = np.asarray(ImageGrab.grab(bbox = (80, 365, 330, 500)).convert('L'))
+        # plt.imshow(state, cmap='grey')
+        # plt.axis('off')
+        # plt.savefig(f'misc/trans/dino_{self.timeStamp}', bbox_inches = 'tight', pad_inches = 0) 
 
         state = cv.Canny(state, 100, 200)
         return state
