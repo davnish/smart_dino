@@ -3,6 +3,5 @@ results
 __pycache__
 DeepQLearning
 vis.py
-# misc
 models
 dino.png
