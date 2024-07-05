@@ -26,7 +26,7 @@ class createNetwork(nn.Module):
         self.maxpool3 = nn.MaxPool2d(3)
 
         self.flat = nn.Flatten()
-        self.l1 = nn.Linear(512, 128)
+        self.l1 = nn.Linear(256, 128)
         self.l2 = nn.Linear(128, 64)
         self.output = nn.Linear(64, 2)
     
@@ -77,6 +77,7 @@ class DeepQLearning:
         self.save_freq = save_freq
         self.model_no = model_no
         self.st_episode = self.recent_episode()
+        self.epsilon = self.epsilon_decay ** self.st_episode
         # self.device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu' # If You want to use gpu uncommnet this
         self.device = 'cpu'
         self.onlineNetwork = createNetwork().to(self.device)
@@ -219,7 +220,7 @@ class DeepQLearning:
         return mx
 
 if __name__ == "__main__":
-    x = torch.rand(1,4,150,81)
+    x = torch.rand(1,4,150,69)
     model = createNetwork()
     st = time.time()
     x = model(x)

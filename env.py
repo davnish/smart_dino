@@ -51,7 +51,7 @@ class WebDino:
         if action == 1: self.element.send_keys(Keys.SPACE)
 
     def returnState(self):
-        state = np.asarray(ImageGrab.grab(bbox = (80, 365, 330, 500)).convert('L'))
+        state = np.asarray(ImageGrab.grab(bbox = (80, 385, 330, 500)).convert('L'))
         # plt.imshow(state, cmap='grey')
         # plt.axis('off')
         # plt.savefig(f'misc/trans/dino_{self.timeStamp}', bbox_inches = 'tight', pad_inches = 0) 
