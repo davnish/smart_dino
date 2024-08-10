@@ -4,5 +4,4 @@
 
 This is the pytorch implementation of the DQN algorithm which is used to soslve the chrome dino game
 
-
 </div>
