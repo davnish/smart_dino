@@ -1,8 +1,5 @@
-results
 .DS_Store
 __pycache__
-DeepQLearning
 vis.py
-models
 dino.png
 det_termination.py

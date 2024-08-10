@@ -205,16 +205,16 @@ class DeepQLearning:
 
 
     def save_progress(self, episode):
-        path = os.path.join("models", f"DQ_{self.model_no}")
-        if not os.path.exists(os.path.join('models', f'DQ_{self.model_no}')):
-            os.makedirs(path)
+        path = os.path.join("models")
+        # if not os.path.exists(os.path.join('models', f'DQ_{self.model_no}')):
+        #     os.makedirs(path)
         mx = self.recent_episode()
         torch.save(self.onlineNetwork.state_dict(), os.path.join(path, f"ckpt_{self.save_freq+mx}.pt"))
         print(f"Model Saved at {episode} episodes, named: ckpt_{self.save_freq+mx}.pt")
 
     def recent_episode(self):
         mx = 0
-        for x in glob.glob(os.path.join("models", f"DQ_{self.model_no}", f"ckpt_*.pt")):
+        for x in glob.glob(os.path.join("models", f"ckpt_*.pt")):
             n = int(x.split('_')[-1].split('.')[-2])
             mx = n if mx<n else mx
         return mx
