@@ -15,16 +15,15 @@ Chrome's dino environment is captured through [selenium](https://selenium-python
 ├── .gitignore
 ├── DQN.py (Implementation of DeepQLearning class and createNetwork class)
 ├── README.md
-├── dino.png (temporary image file, which will be created and updated while running the env, which will be feed to the model)
 ├── dino_env.yml (requirements file for creating the conda env)
 ├── env.py (Class implementation of WebDino, which containes all the necessary functions and attributes for creating the environment)
 ├── main.py (Here all the classes come together and the model is sent into training)
 ├── misc
 │   └── dino_model.gif
 ├── results
-│   ├── DQ.png
+│   ├── DQ_6.png
 ├── models (Contains the pretrained model)
-│   ├── ckpt.pt 
+│   ├── ckpt_1800.pt 
 └── vis.py
 ```
 
@@ -39,6 +38,11 @@ Chrome's dino environment is captured through [selenium](https://selenium-python
 - `pandas` for creating and storing rewards graphs.
 - `pillow` for the taking the screenshots on a specified location on display.
 - `opencv` for image processing before feeding to model.
+
+## rewards/episodes
+<p align="center">
+<img width="500" alt="overview_arch" src="https://github.com/davnish/smart_dino/blob/main/results/DQ_6.png">
+</p>
 
 ## install
 > [!Important]
