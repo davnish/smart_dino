@@ -1,0 +1,6 @@
+torch
+selenium
+pandas
+pillow
+opencv-python
+matplotlib

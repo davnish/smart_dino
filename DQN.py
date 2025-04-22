@@ -51,7 +51,7 @@ class DeepQLearning:
     def __init__(self, env, gamma, epsilon, epsilon_decay, epsilon_end, lr, TAU, replayBufferSize, batchReplayBufferSize, numberEpisodes, save_freq, model_no, load_model = False):
         '''
         env : This is the environment.
-        gamma : Discount Factor.
+        gamma : Discount Factor to discount future rewards.
         epsilon : Probability of choosing the random action.
         epsilon_decay : The rate of decay of epsilon.
         epsilon_end : The lowest you want the epsilon to be.
@@ -100,7 +100,7 @@ class DeepQLearning:
     
     def trainigEpisodes(self):
 
-        for indexEpisode in range(self.st_episode+1, self.st_episode+self.numberEpisodes+1):
+        for indexEpisode in range(self.st_episode+1, self.st_episode+self.numberEpisodes+1): #st_episode after we continue training the models epich will start after st_episode
 
             rewardsEpisode = 0
             currState = torch.tensor(self.env.reset()) # Converting to tensor
@@ -138,10 +138,10 @@ class DeepQLearning:
   
     def selectAction(self, currState):
         if torch.rand(1).item() < self.epsilon:
-            return np.random.choice(self.env.action_space)
+            return np.random.choice(self.env.action_space) # Both can be taken
         else:
             with torch.no_grad():
-                q_value = self.onlineNetwork(currState.to(self.device))
+                q_value = self.onlineNetwork(currState.to(self.device)) # Online model is performing the inference here for the current state.
                 # print(q_value)
                 return torch.argmax(q_value).item()
         
